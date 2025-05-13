@@ -1,55 +1,50 @@
-# 90IGISP Backend
+# 90Express Backend Platform
 
 ## 🔍 Overview
 
-**90IGISP** (Interactive Geographic Information Service Platform) is a secure, high-performance backend platform designed to ingest, manage, and serve geospatial tip data for national crime detection systems like **Osiris / Smol Detective**.
+**90Express Backend Platform** is a modular, geospatial infrastructure designed to serve as the backend for applications requiring secure, real-time location-based data processing and querying.
 
-It is a critical layer in the Osiris crime analysis ecosystem, acting as the real-time geospatial data gateway. The system is built for extensibility, scalability, and security—powering both real-time and analytical crime data workflows.
+This backend powers a variety of systems including:
+
+- **90IGISP** – Geospatial data backend for law enforcement and public safety tools like **Osiris / Smol Detective**
+- **90 Express Logistics** – Real-time package and courier tracking
+- **79 Express Courier** – Delivery route optimization and geographic data services
+
+It is optimized for high performance, security, and easy integration with modern frontend frameworks and AI services.
 
 ---
 
-## 🧩 Key Components
+## 🧩 Core Capabilities
 
 | Component        | Description                                                                 |
 |------------------|-----------------------------------------------------------------------------|
-| **90Auth**       | API Gateway and authentication layer (JWT-based)                           |
-| **90IGISP Core** | Business logic and service layer for interacting with GIS data              |
-| **PostgreSQL + PostGIS** | Stores geospatial tip data with advanced querying capabilities         |
-| **Redis Cache**  | Caches frequently requested data to reduce DB load and improve performance |
-| **Kafka**        | Asynchronous message system used to unlock geospatial data dynamically     |
-| **GraphQL API**  | Query layer for frontend and AI clients to fetch structured geospatial data |
+| **API Gateway (90Auth)**  | Authentication and request routing using JWTs                        |
+| **GIS Service Layer (90IGISP)** | Central geospatial business logic (querying, filtering, unlocking)   |
+| **PostGIS Database**      | Spatial data storage for tips, packages, delivery zones, etc.         |
+| **Redis Cache (90Scan)**  | Improves performance with caching for API and Kafka responses        |
+| **Kafka Integration**     | Supports event-based communication (e.g., tip unlocking, route updates)|
+| **GraphQL API**           | Provides structured data access for frontend dashboards or AI clients |
 
 ---
 
-## 📦 Features
+## 📦 Use Cases
 
-- 🔐 **JWT Authentication** via `90Auth` for secure API access
-- 🗺️ **Geospatial Storage** using PostgreSQL with PostGIS for precise location data
-- ⚡ **Redis Caching** to reduce redundant queries and speed up data delivery
-- 📣 **Kafka Messaging** to asynchronously unlock and stream GIS tip data
-- 📊 **GraphQL Support** for efficient frontend data querying
-- 🔄 **Pluggable Design** that integrates with larger systems like Osiris / Smol Detective
-
----
-
-## ⚙️ Technologies Used
-
-- Node.js / Express
-- PostgreSQL + PostGIS
-- Redis
-- Kafka (KafkaJS)
-- GraphQL (Apollo Server)
-- Supabase (optional alternative for hosting/auth)
+- 📍 Geospatial crime tip mapping (e.g., Osiris / Smol Detective)
+- 🚚 Real-time courier package tracking and dispatch visibility
+- 🗺️ Delivery route optimization and proximity-based queries
+- ⚡ Caching and streaming data pipelines for mobile or web apps
+- 🔐 Secure, role-based access to sensitive geographic data
 
 ---
 
-## 🚀 Use Cases
+## ⚙️ Technology Stack
 
-- Submit and store citizen tips with geographic coordinates
-- Authenticate requests and manage role-based access
-- Cache and query crime data for real-time AI-powered analysis
-- Trigger data unlock events via Kafka for Smol Detective analysis pipeline
-- Visualize geospatial tips via an interactive map frontend
+- **Node.js / Express** – Core API and middleware
+- **PostgreSQL + PostGIS** – Relational and spatial database
+- **Redis** – Caching layer
+- **KafkaJS** – Message streaming engine
+- **Apollo GraphQL** – Modern query interface
+- **Optional: Supabase** – Managed hosting, Auth, and APIs
 
 ---
 
@@ -60,11 +55,11 @@ It is a critical layer in the Osiris crime analysis ecosystem, acting as the rea
 - Node.js (v18+)
 - PostgreSQL with PostGIS enabled
 - Redis (local or cloud)
-- Kafka (local broker or Confluent Cloud)
+- Kafka (local broker or cloud, e.g., Confluent)
 - Supabase (optional)
 
 ### 📥 Clone the Repo
 
 ```bash
-git clone https://github.com/yourusername/90igisp.git
-cd 90igisp
+git clone https://github.com/yourorg/90express-backend.git
+cd 90express-backend
