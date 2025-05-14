@@ -23,4 +23,8 @@ module.exports = {
     clientId: process.env.KAFKA_CLIENT_ID || '90igisp',
     groupId: process.env.KAFKA_GROUP_ID || '90igisp-group',
   },
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY,
+  },
 };

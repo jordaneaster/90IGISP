@@ -1,25 +1,47 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { getGISPoint, getGISPointsWithinRadius } = require('../services/database');
+const { supabase, gisHelpers } = require('../services/supabase');
 const { sendMessage } = require('../services/kafka');
+const crsEngine = require('../services/crs');
+const costCalculator = require('../services/costCalculator');
 const cacheMiddleware = require('../middleware/cache');
 const config = require('../config/config');
+const trackingRoutes = require('./tracking');
 
 /**
  * API Routes
  * Defines REST endpoints for the 90IGISP system
  */
 
+// Mount tracking routes
+router.use('/tracking', trackingRoutes);
+
 // Sample endpoint to get GIS data with caching (cache for 5 minutes)
 router.get('/gisdata/:id', cacheMiddleware(300), async (req, res) => {
   try {
     const id = req.params.id;
-    const gisPoint = await getGISPoint(id);
     
-    if (!gisPoint) {
-      return res.status(404).json({ error: 'GIS point not found' });
+    const { data: gisPoint, error } = await supabase
+      .from('gis_points')
+      .select('id, name, properties')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ error: 'GIS point not found' });
+      }
+      throw error;
     }
+    
+    // Get GeoJSON from PostGIS
+    const { data: geojson, error: geoError } = await supabase
+      .rpc('get_geojson_for_point', { point_id: id });
+    
+    if (geoError) throw geoError;
+    
+    gisPoint.geojson = geojson;
     
     res.json({
       success: true,
@@ -40,11 +62,14 @@ router.get('/gisdata/search/radius', cacheMiddleware(300), async (req, res) => {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
     
-    const points = await getGISPointsWithinRadius(
-      parseFloat(lat),
-      parseFloat(lng),
-      parseFloat(radius)
-    );
+    const { data: points, error } = await supabase
+      .rpc('points_within_radius', {
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        radius_meters: parseFloat(radius)
+      });
+    
+    if (error) throw error;
     
     res.json({
       success: true,
@@ -77,6 +102,47 @@ router.post('/gisdata/unlock/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error unlocking GIS data:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// CRS Load Matching endpoint
+router.post('/crs/match', async (req, res) => {
+  try {
+    const shipmentRequest = req.body;
+    
+    if (!shipmentRequest.origin || !shipmentRequest.destination || !shipmentRequest.weight) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Missing required shipment details' 
+      });
+    }
+    
+    const matchResult = await crsEngine.findMatchingLoads(shipmentRequest);
+    
+    res.json({
+      success: true,
+      data: matchResult
+    });
+  } catch (error) {
+    console.error('Error in CRS load matching:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// CRS Cost breakdown for a shipment
+router.get('/crs/costs/:shipmentId', cacheMiddleware(300), async (req, res) => {
+  try {
+    const { shipmentId } = req.params;
+    
+    const costBreakdown = await costCalculator.getCostBreakdown(shipmentId);
+    
+    res.json({
+      success: true,
+      data: costBreakdown
+    });
+  } catch (error) {
+    console.error('Error fetching cost breakdown:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
