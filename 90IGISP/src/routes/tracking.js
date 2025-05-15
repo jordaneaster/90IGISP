@@ -42,15 +42,19 @@ router.post('/', async (req, res) => {
     }
     
     // Cache the most recent location for this shipment
-    const cacheKey = `tracking:latest:${shipmentId}`;
-    await redisClient.setEx(cacheKey, 3600, JSON.stringify({
-      id: data.id,
-      shipmentId: data.shipment_id,
-      lat,
-      lng,
-      metadata: data.metadata,
-      timestamp: data.created_at
-    }));
+    try {
+      const cacheKey = `tracking:latest:${shipmentId}`;
+      await redisClient.setEx(cacheKey, 3600, JSON.stringify({
+        id: data.id,
+        shipmentId: data.shipment_id,
+        lat,
+        lng,
+        metadata: data.metadata,
+        timestamp: data.created_at
+      }));
+    } catch (cacheError) {
+      console.log('Redis caching error (non-critical):', cacheError.message);
+    }
     
     res.status(201).json({
       success: true,
@@ -76,17 +80,23 @@ router.post('/', async (req, res) => {
 router.get('/:shipmentId/latest', async (req, res) => {
   try {
     const { shipmentId } = req.params;
+    let usedCache = false;
     
     // Try to get from cache first
-    const cacheKey = `tracking:latest:${shipmentId}`;
-    const cachedLocation = await redisClient.get(cacheKey);
-    
-    if (cachedLocation) {
-      return res.json({
-        success: true,
-        data: JSON.parse(cachedLocation),
-        source: 'cache'
-      });
+    try {
+      const cacheKey = `tracking:latest:${shipmentId}`;
+      const cachedLocation = await redisClient.get(cacheKey);
+      
+      if (cachedLocation) {
+        usedCache = true;
+        return res.json({
+          success: true,
+          data: JSON.parse(cachedLocation),
+          source: 'cache'
+        });
+      }
+    } catch (cacheError) {
+      console.log('Redis get error (falling back to database):', cacheError.message);
     }
     
     // If not in cache, query the database
@@ -129,7 +139,12 @@ router.get('/:shipmentId/latest', async (req, res) => {
     };
     
     // Cache for next time
-    await redisClient.setEx(cacheKey, 3600, JSON.stringify(locationData));
+    try {
+      const cacheKey = `tracking:latest:${shipmentId}`;
+      await redisClient.setEx(cacheKey, 3600, JSON.stringify(locationData));
+    } catch (cacheError) {
+      console.log('Redis cache error (non-critical):', cacheError.message);
+    }
     
     res.json({
       success: true,

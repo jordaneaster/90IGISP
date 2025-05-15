@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 3001,
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRATION || '1h',
@@ -24,7 +24,8 @@ module.exports = {
     groupId: process.env.KAFKA_GROUP_ID || '90igisp-group',
   },
   supabase: {
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_KEY,
+    url: process.env.SUPABASE_URL || 'https://bxdnbinhpmcvebxrigve.supabase.co',
+    key: process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4ZG5iaW5ocG1jdmVieHJpZ3ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NTMwMzgsImV4cCI6MjA1NjQyOTAzOH0.Qe0n1moB4xDHRU5xHVWidIsnjZ9BxdWtWG95KBXOeG8',
+    serviceKey: process.env.SUPABASE_SERVICE_KEY // Optional for admin operations
   },
 };

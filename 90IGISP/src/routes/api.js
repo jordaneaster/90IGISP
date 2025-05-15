@@ -147,25 +147,109 @@ router.get('/crs/costs/:shipmentId', cacheMiddleware(300), async (req, res) => {
   }
 });
 
-// User authentication endpoint that returns a JWT token (90Auth)
+// User authentication endpoints (90Auth)
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  
-  // Mock authentication - in production, validate against database
-  if (username === 'demo' && password === 'password') {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Username and password are required' 
+      });
+    }
+    
+    // Mock authentication - in production, validate against database
+    if (username === 'demo' && password === 'password') {
+      const token = jwt.sign(
+        { id: 1, username: 'demo', role: 'user' },
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
+      );
+      
+      return res.json({
+        success: true,
+        token,
+        user: { id: 1, username: 'demo', role: 'user' }
+      });
+    }
+    
+    res.status(401).json({ success: false, error: 'Invalid credentials' });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, error: 'Server error during authentication' });
+  }
+});
+
+// Verify token validity
+router.get('/verify-token', (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, config.jwt.secret);
+    
+    res.json({
+      success: true,
+      user: {
+        id: decoded.id,
+        username: decoded.username,
+        role: decoded.role
+      },
+      tokenExpiration: new Date(decoded.exp * 1000)
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ success: false, error: 'Token expired' });
+    }
+    res.status(401).json({ success: false, error: 'Invalid token' });
+  }
+});
+
+// Register new user
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password, email } = req.body;
+    
+    if (!username || !password || !email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Username, password, and email are required' 
+      });
+    }
+    
+    // In a real application, check if username already exists
+    // and securely hash the password before storing
+    
+    // Mock successful registration
+    // In a real application, store user in database
+    const newUser = { id: Date.now(), username, email, role: 'user' };
+    
+    // Generate token for automatic login
     const token = jwt.sign(
-      { id: 1, username: 'demo', role: 'user' },
+      { id: newUser.id, username: newUser.username, role: newUser.role },
       config.jwt.secret,
       { expiresIn: config.jwt.expiresIn }
     );
     
-    return res.json({
+    res.status(201).json({
       success: true,
-      token
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        role: newUser.role
+      }
     });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ success: false, error: 'Server error during registration' });
   }
-  
-  res.status(401).json({ error: 'Invalid credentials' });
 });
 
 module.exports = router;

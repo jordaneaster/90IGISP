@@ -118,7 +118,7 @@ describe('API Routes', () => {
     expect(costCalculator.getCostBreakdown).toHaveBeenCalledWith(shipmentId);
   });
 
-  test('POST /login should return a JWT token', async () => {
+  test('POST /login should return a JWT token and user info', async () => {
     const response = await request(app)
       .post('/api/login')
       .send({ username: 'demo', password: 'password' })
@@ -127,11 +127,24 @@ describe('API Routes', () => {
 
     expect(response.body.success).toBe(true);
     expect(response.body.token).toBeDefined();
+    expect(response.body.user).toBeDefined();
+    expect(response.body.user.username).toBe('demo');
     
     // Verify token is a valid JWT
     const decoded = jwt.decode(response.body.token);
     expect(decoded).toBeDefined();
     expect(decoded.username).toBe('demo');
+  });
+
+  test('POST /login should return 400 for missing credentials', async () => {
+    const response = await request(app)
+      .post('/api/login')
+      .send({ username: 'demo' }) // Missing password
+      .expect('Content-Type', /json/)
+      .expect(400);
+
+    expect(response.body.success).toBe(false);
+    expect(response.body.error).toBeDefined();
   });
 
   test('POST /login should return 401 for invalid credentials', async () => {
@@ -141,6 +154,73 @@ describe('API Routes', () => {
       .expect('Content-Type', /json/)
       .expect(401);
 
+    expect(response.body.success).toBe(false);
+    expect(response.body.error).toBeDefined();
+  });
+
+  test('GET /verify-token should validate a valid token', async () => {
+    // First get a token
+    const loginResponse = await request(app)
+      .post('/api/login')
+      .send({ username: 'demo', password: 'password' });
+
+    const token = loginResponse.body.token;
+    
+    const response = await request(app)
+      .get('/api/verify-token')
+      .set('Authorization', `Bearer ${token}`)
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.user).toBeDefined();
+    expect(response.body.user.username).toBe('demo');
+    expect(response.body.tokenExpiration).toBeDefined();
+  });
+
+  test('GET /verify-token should return 401 for invalid token', async () => {
+    const response = await request(app)
+      .get('/api/verify-token')
+      .set('Authorization', 'Bearer invalidtoken')
+      .expect('Content-Type', /json/)
+      .expect(401);
+
+    expect(response.body.success).toBe(false);
+    expect(response.body.error).toBeDefined();
+  });
+
+  test('POST /register should create a new user and return token', async () => {
+    const userData = {
+      username: 'newuser',
+      password: 'securepass',
+      email: 'newuser@example.com'
+    };
+
+    const response = await request(app)
+      .post('/api/register')
+      .send(userData)
+      .expect('Content-Type', /json/)
+      .expect(201);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.token).toBeDefined();
+    expect(response.body.user).toBeDefined();
+    expect(response.body.user.username).toBe('newuser');
+    
+    // Verify token is a valid JWT
+    const decoded = jwt.decode(response.body.token);
+    expect(decoded).toBeDefined();
+    expect(decoded.username).toBe('newuser');
+  });
+
+  test('POST /register should return 400 for incomplete data', async () => {
+    const response = await request(app)
+      .post('/api/register')
+      .send({ username: 'incomplete' }) // Missing required fields
+      .expect('Content-Type', /json/)
+      .expect(400);
+
+    expect(response.body.success).toBe(false);
     expect(response.body.error).toBeDefined();
   });
 });
