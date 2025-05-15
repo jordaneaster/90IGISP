@@ -10,7 +10,7 @@
 /.pnp
 .pnp.js
 /vendor/
-
+node_modules/
 # Build outputs
 /build
 /dist
@@ -55,3 +55,6 @@ Thumbs.db
 *.rar
 *.tar
 *.zip
+
+
+test-results/

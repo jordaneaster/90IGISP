@@ -1,36 +1,61 @@
 // Mock for Redis client
 
-// In-memory cache for testing
-const cache = new Map();
+// In-memory cache store
+const cacheStore = {};
 
-const createClient = () => {
-  return {
-    connect: jest.fn().mockResolvedValue(true),
-    quit: jest.fn().mockResolvedValue(true),
-    on: jest.fn(),
-    get: jest.fn((key) => Promise.resolve(cache.get(key) || null)),
-    set: jest.fn((key, value) => {
-      cache.set(key, value);
-      return Promise.resolve('OK');
-    }),
-    setEx: jest.fn((key, ttl, value) => {
-      cache.set(key, value);
-      return Promise.resolve('OK');
-    }),
-    del: jest.fn((key) => {
-      const existed = cache.has(key);
-      cache.delete(key);
+const redisClient = {
+  // Set with expiration
+  setEx: jest.fn().mockImplementation((key, ttl, value) => {
+    cacheStore[key] = {
+      value,
+      expiry: Date.now() + (ttl * 1000) // Store expiry in ms
+    };
+    return Promise.resolve('OK');
+  }),
+
+  // Get value
+  get: jest.fn().mockImplementation((key) => {
+    const item = cacheStore[key];
+    if (!item) return Promise.resolve(null);
+    
+    // Check if expired
+    if (item.expiry && item.expiry < Date.now()) {
+      delete cacheStore[key];
+      return Promise.resolve(null);
+    }
+    
+    return Promise.resolve(item.value);
+  }),
+
+  // Delete key
+  del: jest.fn().mockImplementation((key) => {
+    if (typeof key === 'string') {
+      const existed = key in cacheStore;
+      delete cacheStore[key];
       return Promise.resolve(existed ? 1 : 0);
-    }),
-    flushAll: jest.fn(() => {
-      cache.clear();
-      return Promise.resolve('OK');
-    })
-  };
+    }
+    
+    // For array of keys
+    let count = 0;
+    key.forEach(k => {
+      if (k in cacheStore) {
+        delete cacheStore[k];
+        count++;
+      }
+    });
+    return Promise.resolve(count);
+  }),
+
+  // Quit connection
+  quit: jest.fn().mockImplementation(() => {
+    return Promise.resolve('OK');
+  }),
+
+  // Clear all data (helper for tests)
+  _flushAll: () => {
+    Object.keys(cacheStore).forEach(key => delete cacheStore[key]);
+    return Promise.resolve('OK');
+  }
 };
 
-module.exports = {
-  createClient,
-  // Export cache for assertions
-  _getCache: () => cache
-};
+module.exports = redisClient;

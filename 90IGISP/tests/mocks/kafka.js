@@ -44,6 +44,7 @@ class MockConsumer {
     this.connected = false;
     this.subscribed = [];
     this.messageHandler = null;
+    this.errorHandler = null;
   }
   
   connect() {
@@ -61,9 +62,21 @@ class MockConsumer {
     return Promise.resolve();
   }
   
-  run({ eachMessage }) {
-    this.messageHandler = eachMessage;
+  run({ eachMessage, eachBatch }) {
+    if (eachMessage) {
+      this.messageHandler = eachMessage;
+    }
+    if (eachBatch) {
+      this.batchHandler = eachBatch;
+    }
     return Promise.resolve();
+  }
+  
+  on(event, handler) {
+    if (event === 'error') {
+      this.errorHandler = handler;
+    }
+    return this;
   }
   
   // Helper to simulate receiving a message in tests
@@ -79,6 +92,15 @@ class MockConsumer {
           timestamp: Date.now()
         }
       });
+      return true;
+    }
+    return false;
+  }
+  
+  // Helper to simulate an error
+  async simulateError(error) {
+    if (this.errorHandler) {
+      await this.errorHandler(error);
       return true;
     }
     return false;

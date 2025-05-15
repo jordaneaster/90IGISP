@@ -1,3 +1,19 @@
+// Check if reporter packages are available
+let reporters = ['default'];
+try {
+  require.resolve('jest-junit');
+  // Only add jest-junit if it's installed
+  reporters.push(
+    ['jest-junit', {
+      outputDirectory: './test-results',
+      outputName: 'junit.xml',
+    }]
+  );
+} catch (e) {
+  console.warn('\n⚠️ Custom reporter not available. To enable JUnit result file output, run:');
+  console.warn('   npm install --save-dev jest-junit\n');
+}
+
 module.exports = {
   testEnvironment: 'node',
   collectCoverage: true,
@@ -18,5 +34,8 @@ module.exports = {
     '@supabase/supabase-js': '<rootDir>/tests/mocks/supabase.js',
     'redis': '<rootDir>/tests/mocks/redis.js',
     'kafkajs': '<rootDir>/tests/mocks/kafka.js'
-  }
+  },
+  
+  // Use available reporters
+  reporters
 };

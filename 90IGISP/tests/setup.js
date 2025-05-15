@@ -11,7 +11,11 @@ jest.setTimeout(30000);
 afterAll(async () => {
   // Close any connections or clean up resources after tests
   const redisClient = require('../src/services/redis');
-  await redisClient.quit().catch(() => {});
+  
+  // Check if the redis client has a quit method before trying to call it
+  if (redisClient && typeof redisClient.quit === 'function') {
+    await redisClient.quit().catch(() => {});
+  }
   
   // Add any other cleanup operations here
 });
