@@ -1,16 +1,17 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Roboto_Mono } from 'next/font/google';
 import { AuthProvider } from "@/context/AuthContext";
 import Header from "@/components/Header";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Initialize the fonts
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata = {
@@ -20,13 +21,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={inter.className}>
+      <body className="antialiased">
         <AuthProvider>
           <Header />
-          <main className="container mx-auto p-4">
+          <main className={`container mx-auto p-4 ${robotoMono.className}`}>
             {children}
           </main>
         </AuthProvider>
