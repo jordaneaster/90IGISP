@@ -172,7 +172,7 @@ export default function DataPreview({ data = [], onConfirm, onBack, isLoading, v
           
           {errorCount > 0 ? (
             <p className="text-red-700 text-sm">
-              {rowsWithErrors.length} rows have validation errors and can't be imported. These rows are automatically deselected.
+              {rowsWithErrors.length} rows have validation errors and can&apos;t be imported. These rows are automatically deselected.
             </p>
           ) : (
             <p className="text-yellow-700 text-sm">

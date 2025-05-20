@@ -457,7 +457,7 @@ export default function ScanQRCodePage() {
               <p>Scan a QR code or enter a VIN to view vehicle details.</p>
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
                 <p className="text-sm text-blue-800">
-                  <strong>MVP Note:</strong> For testing, try using the "Simulate Camera Scan" button or enter any text in the manual field.
+                  <strong>MVP Note:</strong> For testing, try using the &quot;Simulate Camera Scan&quot; button or enter any text in the manual field.
                 </p>
               </div>
             </div>

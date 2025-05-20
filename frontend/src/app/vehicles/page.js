@@ -427,7 +427,7 @@ export default function VehicleInventoryPage() {
           
           {showingImported && importedVehicles.length === 0 && (
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
-              You haven't imported any vehicles yet.
+              You haven&apos;t imported any vehicles yet.
               <button 
                 className="ml-2 text-blue-500 underline"
                 onClick={() => window.location.href = '/onboarding'} 

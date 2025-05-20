@@ -18,7 +18,7 @@ export default function QrScanner({ onScan, onError, facingMode = 'environment' 
       <div className="text-center mb-6">
         <h3 className="text-lg font-medium mb-2">QR Scanner (MVP Mode)</h3>
         <p className="text-gray-500 text-sm">
-          For the MVP, we're using manual entry instead of camera scanning.
+          For the MVP, we&apos;re using manual entry instead of camera scanning.
         </p>
       </div>
       
