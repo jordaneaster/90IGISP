@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+nixpacksConfigPath = "nixpacks.toml"
+
+[deploy]
+startCommand = "cd 90IGISP && node src/index.js"
+healthcheckPath = "/"
+healthcheckTimeout = 100
