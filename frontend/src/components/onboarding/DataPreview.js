@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
-export default function DataPreview({ data = [], onConfirm, onBack, isLoading, validationIssues = [] }) {
+// Make sure the component is properly exported
+const DataPreview = ({ data = [], onConfirm, onBack, isLoading, validationIssues = [] }) => {
   const [selectedRows, setSelectedRows] = useState(Array.from({ length: data.length }, (_, i) => i));
   const [selectAll, setSelectAll] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -418,4 +419,8 @@ export default function DataPreview({ data = [], onConfirm, onBack, isLoading, v
       </div>
     </div>
   );
-}
+};
+
+// Export both as default and named export to improve compatibility
+export { DataPreview };
+export default DataPreview;
