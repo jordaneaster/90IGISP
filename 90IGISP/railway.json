@@ -1,23 +1,11 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
-  "name": "90IGISP-Backend",
   "build": {
-    "builder": "nixpacks",
-    "buildCommand": "cd 90IGISP && npm ci"
+    "builder": "NIXPACKS",
+    "buildCommand": "cd 90IGISP && npm install --no-cache --production=false --legacy-peer-deps"
   },
   "deploy": {
     "startCommand": "cd 90IGISP && node src/index.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
-  },
-  "variables": {
-    "NODE_ENV": "production",
-    "PORT": "3001"
-  },
-  "healthcheck": {
-    "port": 3001,
-    "path": "/api/health",
-    "interval": 10,
-    "timeout": 5
   }
 }

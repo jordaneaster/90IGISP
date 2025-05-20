@@ -1,40 +1,24 @@
 {
   "name": "90igisp",
   "version": "1.0.0",
-  "description": "Interactive GIS Platform",
-  "main": "src/index.js",
+  "description": "90IGISP - Vehicle Management System",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "db:migrate": "node scripts/run-migrations.js",
-    "test": "jest",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration",
-    "test:e2e": "jest tests/e2e",
-    "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
-    "test:json": "jest --json --outputFile=./test-results/results.json",
-    "setup:test": "npm install --save-dev jest-junit && mkdir -p test-results"
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd 90IGISP && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "dev:backend": "cd 90IGISP && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd 90IGISP && npm start",
+    "start:frontend": "cd frontend && npm start"
   },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.7.1",
-    "apollo-server-express": "^3.5.0",
-    "axios": "^1.9.0",
-    "cors": "^2.8.5",
-    "dotenv": "^10.0.0",
-    "express": "^4.17.1",
-    "graphql": "^16.0.0",
-    "ioredis": "^5.6.1",
-    "jsonwebtoken": "^8.5.1",
-    "kafkajs": "^1.15.0",
-    "pg": "^8.7.1",
-    "redis": "^4.0.0"
-  },
+  "keywords": [
+    "vehicle",
+    "tracking",
+    "management"
+  ],
   "devDependencies": {
-    "jest": "^29.5.0",
-    "jest-json-reporter": "^1.2.2",
-    "jest-junit": "^16.0.0",
-    "nodemon": "^2.0.15",
-    "supertest": "^6.3.3"
+    "concurrently": "^8.2.0"
   }
 }
