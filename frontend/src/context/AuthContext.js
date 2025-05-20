@@ -2,9 +2,20 @@
 
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import apiService from '@/services/api';
 
 const AuthContext = createContext({});
+
+// Hardcoded user for MVP
+const hardcodedUser = {
+  id: '1',
+  username: 'admin',
+  email: 'admin@example.com',
+  role: 'admin',
+  name: 'Admin User'
+};
+
+// Hardcoded token for MVP
+const hardcodedToken = 'mvp-hardcoded-token';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,52 +23,30 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated on client side
-    const checkAuth = async () => {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('token');
-        if (token) {
-          try {
-            // Verify token with backend
-            const response = await apiService.verifyToken();
-            if (response.data.success) {
-              setUser(response.data.user);
-            } else {
-              // Token invalid, clear it
-              localStorage.removeItem('token');
-            }
-          } catch (err) {
-            // Token verification failed, clear it
-            console.error('Token verification failed:', err);
-            localStorage.removeItem('token');
-          }
-        }
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuth();
+    // Auto login with hardcoded user for MVP
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', hardcodedToken);
+      setUser(hardcodedUser);
+      setIsLoading(false);
+    }
   }, []);
 
-  const login = async (token) => {
-    localStorage.setItem('token', token);
-    try {
-      // Get user data after setting token
-      const response = await apiService.verifyToken();
-      if (response.data.success) {
-        setUser(response.data.user);
-        // Redirect to routes page after login
-        router.push('/routes');
-      }
-    } catch (err) {
-      console.error('Error getting user data after login:', err);
-    }
+  const login = async () => {
+    // Set hardcoded token and user without API call
+    localStorage.setItem('token', hardcodedToken);
+    setUser(hardcodedUser);
+    router.push('/routes');
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
     router.push('/');
+    
+    // For MVP, we auto-login again after logout
+    setTimeout(() => {
+      login();
+    }, 1000);
   };
 
   return (
