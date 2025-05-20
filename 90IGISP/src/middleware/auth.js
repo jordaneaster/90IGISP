@@ -1,46 +1,35 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
-
 /**
- * JWT Authentication Middleware (90Auth)
- * Validates incoming requests with JWT token
+ * Simplified Auth Middleware for MVP
+ * Always authenticates with a hardcoded admin user
  */
 const authMiddleware = (req, res, next) => {
+  // For MVP, check if auth header contains hardcoded token or bypass auth completely
+  const authHeader = req.headers.authorization;
+  const hardcodedToken = 'mvp-hardcoded-token';
+  
   // Skip authentication for public endpoints
   if (req.path === '/api/login' || req.path === '/api/register' || req.path === '/api/verify-token') {
     return next();
   }
+  
+  // For MVP, either accept hardcoded token or bypass auth completely
+  // Option 1: Accept hardcoded token
+  if (authHeader && authHeader.includes(hardcodedToken)) {
+    // Valid hardcoded token
+  } 
+  // Option 2: Even if no token or invalid, still authenticate for MVP
+  
+  // Hardcoded user for MVP development
+  req.user = {
+    id: '1',
+    username: 'admin',
+    email: 'admin@example.com',
+    role: 'admin',
+    // Add any other user properties your app expects
+  };
 
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ 
-      success: false, 
-      error: 'Authentication required' 
-    });
-  }
-
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, config.jwt.secret);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Token expired', 
-        code: 'TOKEN_EXPIRED'
-      });
-    }
-    
-    return res.status(401).json({ 
-      success: false, 
-      error: 'Invalid token', 
-      code: 'INVALID_TOKEN'
-    });
-  }
+  // Always proceed with the hardcoded user
+  next();
 };
 
 module.exports = authMiddleware;

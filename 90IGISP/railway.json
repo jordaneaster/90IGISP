@@ -1,0 +1,17 @@
+{
+  "name": "90IGISP-Backend",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3001",
+    "JWT_SECRET": "${{ secrets.JWT_SECRET }}"
+  },
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "npm ci"
+  },
+  "run": "node src/index.js",
+  "healthcheck": {
+    "port": "3001",
+    "path": "/api/health"
+  }
+}

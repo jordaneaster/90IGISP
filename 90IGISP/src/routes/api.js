@@ -8,6 +8,7 @@ const costCalculator = require('../services/costCalculator');
 const cacheMiddleware = require('../middleware/cache');
 const config = require('../config/config');
 const trackingRoutes = require('./tracking');
+const onboardingRoutes = require('./onboarding');
 
 /**
  * API Routes
@@ -16,6 +17,9 @@ const trackingRoutes = require('./tracking');
 
 // Mount tracking routes
 router.use('/tracking', trackingRoutes);
+
+// Mount onboarding routes
+router.use('/onboarding', onboardingRoutes);
 
 // Sample endpoint to get GIS data with caching (cache for 5 minutes)
 router.get('/gisdata/:id', cacheMiddleware(300), async (req, res) => {
@@ -250,6 +254,16 @@ router.post('/register', async (req, res) => {
     console.error('Registration error:', error);
     res.status(500).json({ success: false, error: 'Server error during registration' });
   }
+});
+
+// Health check endpoint for hosting platforms
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: '90IGISP API',
+    version: '1.0.0'
+  });
 });
 
 module.exports = router;

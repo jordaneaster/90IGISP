@@ -14,7 +14,15 @@ const resolvers = require('./graphql/resolvers');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        'https://your-vercel-app-name.vercel.app', 
+        'https://your-custom-domain.com'
+      ] 
+    : 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(express.json());
 
 // JWT Authentication middleware (90Auth)

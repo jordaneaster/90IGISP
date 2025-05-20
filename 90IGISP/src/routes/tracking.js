@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const traccar = require('../services/traccar');
 const { supabase, gisHelpers } = require('../services/supabase');
 const redisClient = require('../services/redis');
 
@@ -213,6 +214,145 @@ router.get('/:shipmentId/history', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve location history'
+    });
+  }
+});
+
+// List all tracked devices (trucks) from Traccar
+router.get('/devices', async (req, res) => {
+  try {
+    const devices = await traccar.getDevices();
+    
+    // If we get null or [] from the service
+    if (!devices || (Array.isArray(devices) && devices.length === 0)) {
+      return res.json({ 
+        success: true, 
+        data: [],
+        message: "No devices found or connection issue with Traccar"
+      });
+    }
+    
+    // Add location coordinates to each device for easier mapping
+    const devicesWithPositions = await Promise.all(devices.map(async (device) => {
+      try {
+        // Get latest position for this device
+        const positions = await traccar.getDevicePositions(device.id);
+        if (positions && positions.length > 0) {
+          const latestPosition = positions[0];
+          return {
+            ...device,
+            latitude: latestPosition.latitude,
+            longitude: latestPosition.longitude,
+            altitude: latestPosition.altitude,
+            speed: latestPosition.speed,
+            course: latestPosition.course
+          };
+        }
+        return device;
+      } catch (err) {
+        console.error(`Error fetching position for device ${device.id}:`, err.message);
+        return device;
+      }
+    }));
+    
+    res.json({ success: true, data: devicesWithPositions });
+  } catch (err) {
+    console.error('Error fetching Traccar devices:', err.message);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch devices',
+      message: err.message
+    });
+  }
+});
+
+// Get latest position for one device
+router.get('/devices/:id/positions', async (req, res) => {
+  try {
+    const positions = await traccar.getDevicePositions(req.params.id);
+    
+    if (!positions || positions.length === 0) {
+      return res.json({ 
+        success: true, 
+        data: [],
+        message: "No positions found for this device"
+      });
+    }
+    
+    res.json({ success: true, data: positions });
+  } catch (err) {
+    console.error('Error fetching Traccar positions:', err.message);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch positions',
+      message: err.message
+    });
+  }
+});
+
+/* Create a fake device in Traccar (useful for prototyping).
+ * Body: { name: string, uniqueId: string }
+ */
+router.post('/devices', async (req, res) => {
+  try {
+    const { name, uniqueId } = req.body;
+    if (!name || !uniqueId) {
+      return res.status(400).json({ success: false, error: 'name and uniqueId required' });
+    }
+    
+    const device = await traccar.createDevice({ name, uniqueId });
+    
+    if (!device) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to create device in Traccar',
+        message: "No response from Traccar server"
+      });
+    }
+    
+    res.status(201).json({ success: true, data: device });
+  } catch (err) {
+    console.error('Error creating Traccar device:', err.message);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to create device',
+      message: err.message
+    });
+  }
+});
+
+/**
+ * Lookup a single device by its VIN (uniqueId).
+ */
+router.get('/devices/vin/:vin', async (req, res) => {
+  try {
+    const vin = req.params.vin;
+    const device = await traccar.getDeviceByVin(vin);
+    
+    if (!device) {
+      return res.status(404).json({ success: false, error: `Device VIN ${vin} not found` });
+    }
+    
+    // Get latest position
+    let position = null;
+    try {
+      const positions = await traccar.getDevicePositions(device.id);
+      if (positions && positions.length > 0) {
+        position = positions[0];
+        device.latitude = position.latitude;
+        device.longitude = position.longitude;
+      }
+    } catch (posErr) {
+      console.error(`Error fetching position for device ${device.id}:`, posErr.message);
+    }
+    
+    res.json({ success: true, data: device, position });
+  } catch (err) {
+    console.error('Error looking up device by VIN:', err.message);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Lookup failed',
+      message: err.message
     });
   }
 });
