@@ -2,9 +2,8 @@
 # It should be in the root of your repository (e.g., c:\Users\TParis\Desktop\90IGISP\nixpacks.toml)
 
 [phases.setup]
-# Add "nodejs_18" and "npm" to the list of Nix packages.
-# Ensure "npm" is included in the list.
-nixPkgs = ["nodejs_18", "npm"]
+# Fix the npm reference by using nodePackages.npm instead of npm
+nixPkgs = ["nodejs_18", "nodePackages.npm"]
 
 [phases.install]
 # These commands run in the root of your repository.
