@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="31" failures="0" errors="0" time="3.868">
+  <testsuite name="API Routes" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:37" time="1.813" tests="6">
+    <testcase classname="API Routes GET /gisdata/:id should return GIS point data" name="API Routes GET /gisdata/:id should return GIS point data" time="0.077">
+    </testcase>
+    <testcase classname="API Routes GET /gisdata/search/radius should return points within radius" name="API Routes GET /gisdata/search/radius should return points within radius" time="0.019">
+    </testcase>
+    <testcase classname="API Routes POST /crs/match should find matching shipments" name="API Routes POST /crs/match should find matching shipments" time="0.03">
+    </testcase>
+    <testcase classname="API Routes GET /crs/costs/:shipmentId should return cost breakdown" name="API Routes GET /crs/costs/:shipmentId should return cost breakdown" time="0.014">
+    </testcase>
+    <testcase classname="API Routes POST /login should return a JWT token" name="API Routes POST /login should return a JWT token" time="0.015">
+    </testcase>
+    <testcase classname="API Routes POST /login should return 401 for invalid credentials" name="API Routes POST /login should return 401 for invalid credentials" time="0.014">
+    </testcase>
+  </testsuite>
+  <testsuite name="GraphQL Mutations" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:37" time="2.39" tests="3">
+    <testcase classname="GraphQL Mutations unlockGISData mutation should trigger Kafka message" name="GraphQL Mutations unlockGISData mutation should trigger Kafka message" time="0.038">
+    </testcase>
+    <testcase classname="GraphQL Mutations recordTrackingEvent mutation should save location" name="GraphQL Mutations recordTrackingEvent mutation should save location" time="0.011">
+    </testcase>
+    <testcase classname="GraphQL Mutations mutations should fail without authentication" name="GraphQL Mutations mutations should fail without authentication" time="0.091">
+    </testcase>
+  </testsuite>
+  <testsuite name="GraphQL Queries" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:37" time="2.717" tests="5">
+    <testcase classname="GraphQL Queries gisPoint query should return point data" name="GraphQL Queries gisPoint query should return point data" time="0.03">
+    </testcase>
+    <testcase classname="GraphQL Queries gisPointsWithinRadius query should return points" name="GraphQL Queries gisPointsWithinRadius query should return points" time="0.005">
+    </testcase>
+    <testcase classname="GraphQL Queries matchedLoads query should find compatible shipments" name="GraphQL Queries matchedLoads query should find compatible shipments" time="0.047">
+    </testcase>
+    <testcase classname="GraphQL Queries costBreakdown query should return cost analysis" name="GraphQL Queries costBreakdown query should return cost analysis" time="0.013">
+    </testcase>
+    <testcase classname="GraphQL Queries routeEfficiencyMetrics query should return metrics" name="GraphQL Queries routeEfficiencyMetrics query should return metrics" time="0.045">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cost Calculator Service" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:40" time="0.144" tests="4">
+    <testcase classname="Cost Calculator Service calculateGroupSplit should allocate costs correctly" name="Cost Calculator Service calculateGroupSplit should allocate costs correctly" time="0.004">
+    </testcase>
+    <testcase classname="Cost Calculator Service getCostBreakdown should return detailed cost information" name="Cost Calculator Service getCostBreakdown should return detailed cost information" time="0.002">
+    </testcase>
+    <testcase classname="Cost Calculator Service _calculateBaseCost should compute base shipping cost" name="Cost Calculator Service _calculateBaseCost should compute base shipping cost" time="0.001">
+    </testcase>
+    <testcase classname="Cost Calculator Service _allocateCosts should distribute costs fairly" name="Cost Calculator Service _allocateCosts should distribute costs fairly" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="CRS Load Matching Engine" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:40" time="0.159" tests="3">
+    <testcase classname="CRS Load Matching Engine findMatchingLoads should return matches for a shipment request" name="CRS Load Matching Engine findMatchingLoads should return matches for a shipment request" time="0.004">
+    </testcase>
+    <testcase classname="CRS Load Matching Engine saveMatchedLoadGroup should save a load group and cost splits" name="CRS Load Matching Engine saveMatchedLoadGroup should save a load group and cost splits" time="0.002">
+    </testcase>
+    <testcase classname="CRS Load Matching Engine Should use cache when available" name="CRS Load Matching Engine Should use cache when available" time="0.01">
+    </testcase>
+  </testsuite>
+  <testsuite name="Tracking API Routes" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:39" time="0.683" tests="4">
+    <testcase classname="Tracking API Routes POST / should record a new location ping" name="Tracking API Routes POST / should record a new location ping" time="0.078">
+    </testcase>
+    <testcase classname="Tracking API Routes POST / should return 400 for invalid data" name="Tracking API Routes POST / should return 400 for invalid data" time="0.015">
+    </testcase>
+    <testcase classname="Tracking API Routes GET /:shipmentId/latest should return the latest location" name="Tracking API Routes GET /:shipmentId/latest should return the latest location" time="0.009">
+    </testcase>
+    <testcase classname="Tracking API Routes GET /:shipmentId/history should return location history" name="Tracking API Routes GET /:shipmentId/history should return location history" time="0.01">
+    </testcase>
+  </testsuite>
+  <testsuite name="Supabase Service" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:40" time="0.098" tests="5">
+    <testcase classname="Supabase Service supabase client should be initialized" name="Supabase Service supabase client should be initialized" time="0.001">
+    </testcase>
+    <testcase classname="Supabase Service gisHelpers makePoint should create a PostGIS point string" name="Supabase Service gisHelpers makePoint should create a PostGIS point string" time="0">
+    </testcase>
+    <testcase classname="Supabase Service gisHelpers toGeography should chain RPC calls correctly" name="Supabase Service gisHelpers toGeography should chain RPC calls correctly" time="0.001">
+    </testcase>
+    <testcase classname="Supabase Service gisHelpers calculateDistance should return distance between two points" name="Supabase Service gisHelpers calculateDistance should return distance between two points" time="0.001">
+    </testcase>
+    <testcase classname="Supabase Service gisHelpers findWithinRadius should return points in the radius" name="Supabase Service gisHelpers findWithinRadius should return points in the radius" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="End-to-end CRS Workflow" errors="0" failures="0" skipped="0" timestamp="2025-05-15T02:37:39" time="1.565" tests="1">
+    <testcase classname="End-to-end CRS Workflow Complete shipment matching and tracking workflow" name="End-to-end CRS Workflow Complete shipment matching and tracking workflow" time="0.152">
+    </testcase>
+  </testsuite>
+</testsuites>
