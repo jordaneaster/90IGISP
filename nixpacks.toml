@@ -1,11 +1,35 @@
+# This file defines the build process for Nixpacks.
+# It should be in the root of your repository (e.g., c:\Users\TParis\Desktop\90IGISP\nixpacks.toml)
+
+providers = ["node"] # Specify that this is a Node.js project
+
 [phases.setup]
-nixPkgs = ['nodejs_18', 'npm-9_x']
+# Define Node.js and npm versions.
+# Ensure these are compatible with your project.
+nixPkgs = ["nodejs_18", "npm"] # Using npm from nixPkgs
 
 [phases.install]
-cmds = ['npm install --no-audit --no-fund --production=false --loglevel=error --prefer-offline']
+# These commands run in the root of your repository.
+# We cd into the application subdirectory '90IGISP' to run npm install.
+cmds = [
+  "echo 'INFO: Custom install phase started.'",
+  "cd 90IGISP && npm install --no-cache --no-audit --no-fund --legacy-peer-deps --loglevel error --production=false",
+  "echo 'INFO: Custom install phase completed.'"
+]
 
+# The [phases.build] is for application build steps like TypeScript compilation or bundling.
+# If your project (in 90IGISP/package.json) has a build script (e.g., "npm run build"), add it here.
+# If not, this phase can be minimal or echo a message.
+# Omitting it might cause Nixpacks to try a default, so it's safer to define it.
 [phases.build]
-cmds = ['cd 90IGISP && npm install --no-audit --no-fund --production=false --loglevel=error --prefer-offline']
+cmds = [
+  "echo 'INFO: Custom build phase started (if applicable).'",
+  # Example: if you had a build script in 90IGISP/package.json:
+  # "cd 90IGISP && npm run build",
+  "echo 'INFO: Custom build phase completed.'"
+]
 
 [start]
+# This command defines how to start your application.
+# It runs from the root of your repository.
 cmd = "cd 90IGISP && node src/index.js"

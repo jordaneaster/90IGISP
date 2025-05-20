@@ -1,8 +1,10 @@
 [build]
 builder = "nixpacks"
+# Tells Railway to look for nixpacks.toml in the project root for build instructions.
 nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
-startCommand = "cd 90IGISP && node src/index.js"
-healthcheckPath = "/"
-healthcheckTimeout = 100
+# The start command will be defined in nixpacks.toml's [start] phase.
+# You can remove or comment out healthcheck settings if not immediately needed.
+healthcheckPath = "/health" # Example, adjust if you have a health endpoint
+healthcheckTimeout = 120
