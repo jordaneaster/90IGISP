@@ -4,19 +4,28 @@
 providers = ["node"] # Specify that this is a Node.js project
 
 [phases.setup]
-# Define Node.js and npm versions.
-# Ensure these are compatible with your project.
-# nodejs_18 should include npm. Removed explicit "npm" which caused the error.
+# Define Node.js version. nodejs_18 should include a compatible npm.
+# Ensure "npm" is NOT listed separately here.
 nixPkgs = ["nodejs_18"]
 
 [phases.install]
-# Define the installation phase for dependencies.
-commands = ["npm install"]
+# These commands run in the root of your repository.
+# We cd into the application subdirectory '90IGISP' to run npm install.
+cmds = [
+  "echo 'INFO: Custom install phase started.'",
+  "cd 90IGISP && npm install --no-cache --no-audit --no-fund --legacy-peer-deps --loglevel error --production=false",
+  "echo 'INFO: Custom install phase completed.'"
+]
 
 [phases.build]
-# Define the build phase for the project.
-commands = ["npm run build"]
+cmds = [
+  "echo 'INFO: Custom build phase started (if applicable).'",
+  # Example: if you had a build script in 90IGISP/package.json:
+  # "cd 90IGISP && npm run build",
+  "echo 'INFO: Custom build phase completed.'"
+]
 
 [start]
-# Define the start phase for the application.
-commands = ["npm start"]
+# This command defines how to start your application.
+# It runs from the root of your repository.
+cmd = "cd 90IGISP && node src/index.js"
